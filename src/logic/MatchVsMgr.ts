@@ -1,9 +1,18 @@
 module logic {
   export class MatchVsMgr extends egret.EventDispatcher {
-    engine: MatchvsEngine;
-    response: MatchvsResponse;
+    private engine: MatchvsEngine;
+    private response: MatchvsResponse;
 
-    public constructor() {
+    // 单例
+    private static _instance: MatchVsMgr = undefined;
+    static get instance(): MatchVsMgr {
+      if (!MatchVsMgr._instance) {
+        MatchVsMgr._instance = new MatchVsMgr();
+      }
+      return MatchVsMgr._instance;
+    }
+
+    private constructor() {
       super();
 
       this.engine = new MatchvsEngine();
@@ -49,7 +58,7 @@ module logic {
 
     // 创建房间
     createRoom(name: string, maxPlayer: number): void {
-      let mode: number = 1;
+      let mode: number = Config.mode;
       let canWatch: number = 1;
       let visibility: number = 1;
       let roomProperty: any = "";
@@ -78,6 +87,36 @@ module logic {
     // 关闭房间
     joinOver(customProfile: string = ""): void {
       this.engine.joinOver(customProfile);
+    }
+
+    // 获取房间列表
+    getRoomList(): void {
+      // let filter = new MsRoomFilter(Config.maxPlayer, Config.mode, 1, "");
+      // this.engine.getRoomList(filter);
+      // 0表示任意最大玩家数
+      let maxPlayer: number = 0;
+      let mode: number = 0; // 	模式（0 - 全部）* 创建房间时，mode最好不要填0 	2
+      let canWatch: number = 0; // 	是否可以观战（0 - 全部 1 - 可以 2 - 不可以） 	1
+      let roomProperty: string = ""; // 	房间属性 	“roomProperty”
+      let full: number = 0; // 	0 - 全部 1 - 满 2 - 未满 	0
+      let state: number = 0; // 	0 - 全部 1 - 开放 2 - 关闭 	0
+      let sort: number = 0; // 	0 - 不排序 1 - 创建时间排序 2 - 玩家数量排序 3 - 状态排序 	0
+      let order: number = 0; // 	0 - ASC 1 - DESC 	0
+      let pageIndex: number = 0; // 	页码 	0
+      let pageSize: number = 10000; // 	每一页的数量 	10
+      let filter = new MsRoomFilterEx(
+        maxPlayer,
+        mode,
+        canWatch,
+        roomProperty,
+        full,
+        state,
+        sort,
+        order,
+        pageIndex,
+        pageSize
+      );
+      this.engine.getRoomListEx(filter);
     }
 
     // 开始游戏
@@ -184,6 +223,24 @@ module logic {
       res.joinOverNotify = over => {
         let data: IJoinOverNotify = {};
         this.fireEvent(EventNames.joinOverNotify, data);
+      };
+
+      // 更新房间列表
+      res.getRoomListExResponse = res => {
+        let status = res.status;
+        let roomList = res.roomAttrs;
+        if (status === 200) {
+          let data: Room[];
+          data = roomList.map(n => {
+            let rst: Room = new Room();
+            rst.id = n.roomID;
+            rst.maxPlayer = n.maxPlayer;
+            rst.status = n.state === 1 ? ERoomStatus.open : ERoomStatus.close;
+            rst.owner = n.owner;
+            return rst;
+          });
+          this.fireEvent(EventNames.updateRoomList, data);
+        }
       };
     }
 
