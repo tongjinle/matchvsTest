@@ -23,12 +23,13 @@ module logic {
 
     // 暴露的方法
     initResponse(): void {
-      this.engine.init(
+      let code: number = this.engine.init(
         this.response,
         Config.channel,
         Config.platform,
         Config.gameId
       );
+      console.log("init response CODE:", code);
     }
 
     // 注册账户
@@ -136,7 +137,7 @@ module logic {
       // 用户注册
       res.registerUserResponse = userInfo => {
         if (userInfo.status === 0) {
-          console.log("register success.");
+          console.log("register success.", userInfo);
           let data: IRegisterUser = {
             userId: userInfo.userID,
             token: userInfo.token,
@@ -148,7 +149,9 @@ module logic {
 
       // 用户登陆
       res.loginResponse = login => {
+        console.log(login);
         if (login.status === 200) {
+          console.log("login success.", login);
           let data: ILogin = {
             // 这个roomId为0,为0的房间,实质上就是大厅
             roomId: login.roomID

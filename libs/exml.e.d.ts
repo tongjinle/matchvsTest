@@ -6,6 +6,8 @@ declare module skins{
 	class CheckBoxSkin extends eui.Skin{
 	}
 }
+declare class HelloWorldSkin extends eui.Skin{
+}
 declare module skins{
 	class HScrollBarSkin extends eui.Skin{
 	}
@@ -17,6 +19,10 @@ declare module skins{
 declare module skins{
 	class ItemRendererSkin extends eui.Skin{
 	}
+}
+declare class LobbySkin extends eui.Skin{
+}
+declare class LoginSkin extends eui.Skin{
 }
 declare module skins{
 	class PanelSkin extends eui.Skin{
