@@ -10,6 +10,6 @@ module logic {
     static joinOpenNotify: string = "joinOpenNotify";
     static joinOver: string = "joinOver";
     static joinOverNotify: string = "joinOverNotify";
-    static updateRoomList: string = "updateRoomList";
+    static getRoomListEx: string = "getRoomListEx";
   }
 }

@@ -26,6 +26,7 @@
 		"bin-debug/view/GameView.js",
 		"bin-debug/view/HelloWorld.js",
 		"bin-debug/view/Lobby.js",
-		"bin-debug/view/Login.js"
+		"bin-debug/view/Login.js",
+		"bin-debug/view/RoomItem.js"
 	]
 }

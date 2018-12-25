@@ -101,5 +101,6 @@ class Main extends eui.UILayer {
     this.gameView = new GameView();
     this.addChild(this.gameView);
     this.gameView.toView("login");
+    // this.gameView.toView("lobby");
   }
 }

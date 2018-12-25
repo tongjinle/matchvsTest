@@ -2,11 +2,9 @@ class Login extends eui.Component implements eui.UIComponent {
   master: GameView;
   loginBtn: eui.Button;
   usernameLab: eui.Label;
-  private mgr: logic.MatchVsMgr;
-  public constructor() {
+  public constructor(master: GameView) {
     super();
-    this.mgr = logic.MatchVsMgr.instance;
-    this.mgr.initResponse();
+    this.master = master;
   }
 
   protected partAdded(partName: string, instance: any): void {
@@ -16,23 +14,11 @@ class Login extends eui.Component implements eui.UIComponent {
 
   protected childrenCreated(): void {
     super.childrenCreated();
-
-    console.log(this.loginBtn);
-
-    this.loginBtn.addEventListener(
-      egret.TouchEvent.TOUCH_END,
-      e => {
-        console.log("touch login button");
-        this.mgr.login(logic.me.userId, logic.me.token);
-      },
-      this
-    );
-
     this.listen();
   }
 
   private listen(): void {
-    let mgr = this.mgr;
+    let mgr = this.master.mgr;
     mgr.addEventListener(
       logic.EventNames.responseInit,
       this.onInitResponse,
@@ -45,11 +31,18 @@ class Login extends eui.Component implements eui.UIComponent {
       this
     );
 
-    mgr.addEventListener(logic.EventNames.login, this.onLogin, this);
+    mgr.addEventListener(logic.EventNames.login, this.onLoginDone, this);
+
+    ///
+    this.loginBtn.addEventListener(
+      egret.TouchEvent.TOUCH_END,
+      this.onLogin,
+      this
+    );
   }
 
   private unListen(): void {
-    let mgr = this.mgr;
+    let mgr = this.master.mgr;
     mgr.removeEventListener(
       logic.EventNames.responseInit,
       this.onInitResponse,
@@ -62,26 +55,38 @@ class Login extends eui.Component implements eui.UIComponent {
       this
     );
 
-    mgr.removeEventListener(logic.EventNames.login, this.onLogin, this);
+    mgr.removeEventListener(logic.EventNames.login, this.onLoginDone, this);
+
+    this.loginBtn.removeEventListener(
+      egret.TouchEvent.TOUCH_END,
+      this.onLogin,
+      this
+    );
   }
 
   private onInitResponse() {
     console.log("init success");
     egret.localStorage.clear();
-    this.mgr.registerUser();
+    this.master.mgr.registerUser();
   }
 
   private onRegisterUser(e: egret.Event) {
     console.log("register user success");
     let user: logic.IRegisterUser = e.data;
-    logic.me.name = user.name;
-    logic.me.userId = user.userId;
-    logic.me.token = user.token;
+    this.master.me.name = user.name;
+    this.master.me.userId = user.userId;
+    this.master.me.token = user.token;
     console.log(user, logic.me);
   }
 
   private onLogin() {
+    console.log("touch login button");
+    this.master.mgr.login(this.master.me.userId, this.master.me.token);
+  }
+
+  private onLoginDone() {
     // 切换到大厅
+    this.master.toView("lobby");
   }
 
   private release(): void {

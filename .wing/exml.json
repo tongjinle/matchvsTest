@@ -1,10 +1,15 @@
 {
-  "167e0038929": {
-    "path": "view\\Lobby.ts",
-    "class": "Lobby",
-    "parentPath": ""
-  },
-  "global": {
-    "globalAutoLayerMarkEnable": false
-  }
+    "167e0038929": {
+        "path": "view\\Lobby.ts",
+        "class": "Lobby",
+        "parentPath": ""
+    },
+    "global": {
+        "globalAutoLayerMarkEnable": false
+    },
+    "167e536b098": {
+        "path": "view\\RoomItem.ts",
+        "class": "RoomItem",
+        "parentPath": "resource/eui_skins/ItemRendererSkin.exml"
+    }
 }

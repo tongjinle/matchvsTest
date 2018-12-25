@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="LobbySkin" width="400" height="300" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
+<e:Skin class="LobbySkin" width="640" height="1136" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
 	<w:Config id="167e0038929" ></w:Config>
+	<e:List id="roomList" width="100%" x="0" anchorOffsetX="0" top="90" bottom="120"  anchorOffsetY="0"/>
+	<e:Label text="游戏大厅" horizontalCenter="0" top="30"/>
+	<e:Button id="createRoomBtn" label="创建房间" x="0" height="120" width="100%" bottom="0"/>
 </e:Skin>

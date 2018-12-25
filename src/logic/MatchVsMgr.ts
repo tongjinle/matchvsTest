@@ -235,14 +235,17 @@ module logic {
         if (status === 200) {
           let data: Room[];
           data = roomList.map(n => {
-            let rst: Room = new Room();
-            rst.id = n.roomID;
-            rst.maxPlayer = n.maxPlayer;
-            rst.status = n.state === 1 ? ERoomStatus.open : ERoomStatus.close;
-            rst.owner = n.owner;
+            let rst: IRoom = {
+              id: n.roomID,
+              name: n.roomName,
+              maxPlayer: n.maxPlayer,
+              status: n.state === 1 ? ERoomStatus.open : ERoomStatus.close,
+              owner: n.owner
+            };
+
             return rst;
           });
-          this.fireEvent(EventNames.updateRoomList, data);
+          this.fireEvent(EventNames.getRoomListEx, data);
         }
       };
     }
