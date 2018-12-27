@@ -1,7 +1,18 @@
 class GameView extends egret.DisplayObjectContainer {
   mgr: logic.MatchVsMgr;
-  me: logic.User;
+  userList: logic.IUser[] = [];
+  // 当前玩家的userId
+  userId: number;
+
+  public get me(): logic.IUser {
+    return this.userList.find(n => n.id === this.userId);
+  }
+  private viewDict: { [index: string]: any } = {};
+
   private layer: eui.UILayer;
+  // 当前view的名字
+  private currName: string;
+  // 当前view实例
   private curr: any;
   constructor() {
     super();
@@ -10,24 +21,56 @@ class GameView extends egret.DisplayObjectContainer {
 
     this.mgr = logic.MatchVsMgr.instance;
     this.mgr.initResponse();
-
-    this.me = new logic.User();
   }
 
-  toView(name: string) {
-    this.clearAll();
+  private createView(name: string): any {
+    let rst: any;
     if (name === "login") {
-      this.curr = new Login(this);
+      rst = new Login(this);
     } else if (name === "lobby") {
-      this.curr = new Lobby(this);
+      rst = new Lobby(this);
+    } else if (name === "waitRoom") {
+      rst = new WaitRoom(this);
     }
-    this.layer.addChild(this.curr);
+    return rst;
   }
 
-  private clearAll(): void {
-    if (this.curr) {
-      this.layer.removeChild(this.curr);
-      this.curr.release && this.curr.release();
+  removeView(name: string): void {
+    let view = this.viewDict[name];
+    if (view) {
+      if (view === this.curr) {
+        this.layer.removeChild(view);
+      }
+      view.release();
     }
+  }
+
+  changeView(name: string): void {
+    console.log("change view:", name);
+    if (this.curr) {
+      this.currName = undefined;
+      this.curr.visible = false;
+    }
+    if (!this.viewDict[name]) {
+      let view = this.createView(name);
+      this.viewDict[name] = view;
+      this.layer.addChild(view);
+    }
+    this.currName = name;
+    this.curr = this.viewDict[name];
+    this.curr.visible = true;
+  }
+
+  replaceView(name: string): void {
+    console.log("replace view:", name);
+    if (this.currName) {
+      this.removeView(this.currName);
+      delete this.viewDict[name];
+    }
+    let view = this.createView(name);
+    this.viewDict[name] = view;
+    this.currName = name;
+    this.curr = view;
+    this.layer.addChild(view);
   }
 }

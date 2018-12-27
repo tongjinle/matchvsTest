@@ -100,7 +100,7 @@ class Main extends eui.UILayer {
   protected createGameScene() {
     this.gameView = new GameView();
     this.addChild(this.gameView);
-    this.gameView.toView("login");
+    this.gameView.replaceView("login");
     // this.gameView.toView("lobby");
   }
 }

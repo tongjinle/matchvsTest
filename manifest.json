@@ -10,7 +10,7 @@
 	],
 	"game": [
 		"bin-debug/logic/User.js",
-		"bin-debug/logic/Lobby.js",
+		"bin-debug/logic/MatchVsMgr.js",
 		"bin-debug/Main.js",
 		"bin-debug/Platform.js",
 		"bin-debug/ThemeAdapter.js",
@@ -18,8 +18,8 @@
 		"bin-debug/logic/Config.js",
 		"bin-debug/logic/EventNames.js",
 		"bin-debug/logic/GameData.js",
+		"bin-debug/logic/Lobby.js",
 		"bin-debug/LoadingUI.js",
-		"bin-debug/logic/MatchVsMgr.js",
 		"bin-debug/logic/Room.js",
 		"bin-debug/logic/Schema.js",
 		"bin-debug/AssetAdapter.js",
@@ -27,6 +27,8 @@
 		"bin-debug/view/HelloWorld.js",
 		"bin-debug/view/Lobby.js",
 		"bin-debug/view/Login.js",
-		"bin-debug/view/RoomItem.js"
+		"bin-debug/view/Room.js",
+		"bin-debug/view/RoomItem.js",
+		"bin-debug/view/WaitRoom.js"
 	]
 }

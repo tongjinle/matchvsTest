@@ -1,15 +1,26 @@
 {
+    "global": {
+        "globalAutoLayerMarkEnable": true,
+        "globalAdsorbEnable": true
+    },
     "167e0038929": {
         "path": "view\\Lobby.ts",
         "class": "Lobby",
         "parentPath": ""
     },
-    "global": {
-        "globalAutoLayerMarkEnable": false
-    },
     "167e536b098": {
         "path": "view\\RoomItem.ts",
         "class": "RoomItem",
         "parentPath": "resource/eui_skins/ItemRendererSkin.exml"
+    },
+    "167e96f98cb": {
+        "path": "view\\Room.ts",
+        "class": "Room",
+        "parentPath": ""
+    },
+    "167f02234a9": {
+        "path": "view\\WaitRoom.ts",
+        "class": "WaitRoom",
+        "parentPath": ""
     }
 }

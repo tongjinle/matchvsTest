@@ -58,7 +58,11 @@ module logic {
     }
 
     // 创建房间
-    createRoom(name: string, maxPlayer: number): void {
+    createRoom(
+      name: string,
+      maxPlayer: number,
+      userProfile: string = ""
+    ): void {
       let mode: number = Config.mode;
       let canWatch: number = 1;
       let visibility: number = 1;
@@ -71,13 +75,17 @@ module logic {
         visibility,
         roomProperty
       );
-      let userProfile: string = "";
       this.engine.createRoom(roomInfo, userProfile);
     }
 
     // 进入房间
     joinRoom(roomId: string, userProfile: string = ""): void {
       this.engine.joinRoom(roomId, userProfile);
+    }
+
+    // 离开房间
+    leaveRoom(cpProto: string = ""): void {
+      this.engine.leaveRoom(cpProto);
     }
 
     // 打开房间
@@ -91,7 +99,7 @@ module logic {
     }
 
     // 获取房间列表
-    getRoomList(): void {
+    getRoomListEx(): void {
       // let filter = new MsRoomFilter(Config.maxPlayer, Config.mode, 1, "");
       // this.engine.getRoomList(filter);
       // 0表示任意最大玩家数
@@ -120,6 +128,11 @@ module logic {
       this.engine.getRoomListEx(filter);
     }
 
+    // 获取房间信息
+    getRoomDetail(roomId: string): void {
+      this.engine.getRoomDetail(roomId);
+    }
+
     // 开始游戏
     startGame(): void {}
 
@@ -138,10 +151,11 @@ module logic {
       res.registerUserResponse = userInfo => {
         if (userInfo.status === 0) {
           console.log("register success.", userInfo);
-          let data: IRegisterUser = {
-            userId: userInfo.userID,
+          let data: IUser = {
+            id: userInfo.userID,
             token: userInfo.token,
-            name: userInfo.name
+            name: userInfo.name,
+            logo: userInfo.avatar
           };
           this.fireEvent(EventNames.registerUser, data);
         }
@@ -201,6 +215,29 @@ module logic {
         this.fireEvent(EventNames.joinRoomNotify, data);
       };
 
+      // 离开房间(主动)
+      res.leaveRoomResponse = res => {
+        let status = res.status;
+        if (status === 200) {
+          let data: ILeaveRoom = {
+            roomId: res.roomID,
+            userId: res.userID,
+            cpProto: res.cpProto
+          };
+          this.fireEvent(logic.EventNames.leaveRoom, data);
+        }
+      };
+
+      // 离开房间(提醒)
+      res.leaveRoomNotify = res => {
+        let data: ILeaveRoom = {
+          roomId: res.roomID,
+          userId: res.userID,
+          cpProto: res.cpProto
+        };
+        this.fireEvent(logic.EventNames.leaveRoomNotify, data);
+      };
+
       // 打开房间
       res.joinOpenResponse = open => {
         if (open.status === 200) {
@@ -233,7 +270,7 @@ module logic {
         let status = res.status;
         let roomList = res.roomAttrs;
         if (status === 200) {
-          let data: Room[];
+          let data: IRoom[];
           data = roomList.map(n => {
             let rst: IRoom = {
               id: n.roomID,
@@ -246,6 +283,25 @@ module logic {
             return rst;
           });
           this.fireEvent(EventNames.getRoomListEx, data);
+        }
+      };
+
+      res.getRoomDetailResponse = res => {
+        let status = res.status;
+        if (status === 200) {
+          let data: IRoomDetail;
+          data = {
+            owner: res.owner,
+            maxPlayer: res.maxPlayer,
+            status: res.state === 1 ? ERoomStatus.open : ERoomStatus.close,
+            userList: res.userInfos.map(n => {
+              let rst = { userId: n.userID, userProfile: n.userProfile };
+              return rst;
+            })
+          };
+          this.fireEvent(EventNames.getRoomDetail, data);
+        } else {
+          console.error("getRoomDetailResponse status:", status);
         }
       };
     }

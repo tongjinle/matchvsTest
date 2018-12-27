@@ -36,6 +36,12 @@ declare module skins{
 	class RadioButtonSkin extends eui.Skin{
 	}
 }
+declare module Room{
+	class Skin extends eui.Skin{
+	}
+}
+declare class RoomItemSkin extends eui.Skin{
+}
 declare module skins{
 	class ScrollerSkin extends eui.Skin{
 	}
@@ -55,4 +61,6 @@ declare module skins{
 declare module skins{
 	class VSliderSkin extends eui.Skin{
 	}
+}
+declare class WaitRoomSkin extends eui.Skin{
 }

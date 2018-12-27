@@ -3,5 +3,6 @@
 	<w:Config id="167e0038929" ></w:Config>
 	<e:List id="roomList" width="100%" x="0" anchorOffsetX="0" top="90" bottom="120"  anchorOffsetY="0"/>
 	<e:Label text="游戏大厅" horizontalCenter="0" top="30"/>
-	<e:Button id="createRoomBtn" label="创建房间" x="0" height="120" width="100%" bottom="0"/>
+	<e:Button id="createRoomBtn" label="创建房间" height="120" width="48%" bottom="0" left="0"/>
+	<e:Button id="enterRoomBtn" label="进入房间" width="48%" bottom="0" height="120" right="0" enabled="false"/>
 </e:Skin>

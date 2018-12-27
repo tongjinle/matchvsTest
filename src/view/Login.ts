@@ -72,21 +72,20 @@ class Login extends eui.Component implements eui.UIComponent {
 
   private onRegisterUser(e: egret.Event) {
     console.log("register user success");
-    let user: logic.IRegisterUser = e.data;
-    this.master.me.name = user.name;
-    this.master.me.userId = user.userId;
-    this.master.me.token = user.token;
+    let user: logic.IUser = e.data;
+    this.master.userList.push(user);
+    this.master.userId = user.id;
     console.log(user, logic.me);
   }
 
   private onLogin() {
     console.log("touch login button");
-    this.master.mgr.login(this.master.me.userId, this.master.me.token);
+    this.master.mgr.login(this.master.me.id, this.master.me.token);
   }
 
   private onLoginDone() {
     // 切换到大厅
-    this.master.toView("lobby");
+    this.master.replaceView("lobby");
   }
 
   private release(): void {

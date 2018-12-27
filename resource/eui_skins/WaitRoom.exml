@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="WaitRoomSkin" width="640" height="1136" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
+	<w:Config id="167f02234a9" ></w:Config><e:Image width="100%" height="180" x="0" y="0" source="header_png"/>
+	<e:Label text="房间" x="0" y="0" anchorOffsetX="0" width="100%" anchorOffsetY="0" height="180" textAlign="center" verticalAlign="middle" size="42" textColor="0xffffff"/>
+	<e:Group width="100%" x="0" top="180" bottom="0">
+		<e:Image id="logo" width="200" height="200" scaleX="1" scaleY="1" bottom="60" right="60"/>
+		<e:Image id="otherLogo" width="200" height="200" top="60" y="74" scaleX="1" scaleY="1" left="60"/>
+		<e:Label id="otherPlayerName" text="" y="60" anchorOffsetX="0" anchorOffsetY="0" height="60" verticalAlign="middle" textAlign="left" left="320" right="60"/>
+		<e:Label id="playerName" text="" y="836" anchorOffsetX="0" width="252" anchorOffsetY="0" height="60" verticalAlign="middle" textAlign="right" left="68"/>
+		<e:Button id="kickBtn" label="踢出房间" y="210" anchorOffsetX="0" right="60" left="320"/>
+		<e:Button id="startBtn" label="开始游戏" horizontalCenter="0" verticalCenter="0" height="80" width="40%"/>
+	</e:Group>
+</e:Skin>
