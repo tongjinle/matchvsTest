@@ -28,7 +28,7 @@ class Lobby extends eui.Component implements eui.UIComponent {
 
   // 根据当前[我]的状态,来设置下ui的表现
   // eg:如果[我]已经有了roomId,那么新建房间是不可以的,而进入房间就可以了
-  refrechUiView(): void {
+  updateView(): void {
     let me = this.master.me;
     this.createRoomBtn.enabled = !me.roomId;
     this.enterRoomBtn.enabled = !!me.roomId;
@@ -106,7 +106,7 @@ class Lobby extends eui.Component implements eui.UIComponent {
     this.master.me.roomId = roomId;
 
     // 设置下"进入房间"按钮可用
-    this.refrechUiView();
+    this.updateView();
 
     // 去我的房间
     this.master.changeView("waitRoom");
