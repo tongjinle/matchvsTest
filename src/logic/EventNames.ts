@@ -8,6 +8,8 @@ module logic {
     static joinRoomNotify: string = "joinRoomNotify";
     static leaveRoom: string = "leaveRoom";
     static leaveRoomNotify: string = "leaveRoomNotify";
+    static kickPlayer: string = "kickPlayer";
+    static kickPlayerNotify: string = "kickPlayerNotify";
     static joinOpen: string = "joinOpen";
     static joinOpenNotify: string = "joinOpenNotify";
     static joinOver: string = "joinOver";

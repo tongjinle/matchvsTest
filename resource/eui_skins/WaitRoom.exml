@@ -6,8 +6,9 @@
 		<e:Image id="logo" width="200" height="200" scaleX="1" scaleY="1" bottom="60" right="60"/>
 		<e:Image id="otherLogo" width="200" height="200" top="60" y="74" scaleX="1" scaleY="1" left="60"/>
 		<e:Label id="otherPlayerName" text="" y="60" anchorOffsetX="0" anchorOffsetY="0" height="60" verticalAlign="middle" textAlign="left" left="320" right="60"/>
-		<e:Label id="playerName" text="" y="836" anchorOffsetX="0" width="252" anchorOffsetY="0" height="60" verticalAlign="middle" textAlign="right" left="68"/>
+		<e:Label id="playerName" text="" y="696" anchorOffsetX="0" width="252" anchorOffsetY="0" height="60" verticalAlign="middle" textAlign="right" left="60"/>
 		<e:Button id="kickBtn" label="踢出房间" y="210" anchorOffsetX="0" right="60" left="320"/>
-		<e:Button id="startBtn" label="开始游戏" horizontalCenter="0" verticalCenter="0" height="80" width="40%"/>
+		<e:Button id="leaveBtn" label="退出房间" y="846" anchorOffsetX="0" right="320" left="60"/>
+		<e:Button id="startBtn" label="开始游戏" horizontalCenter="0" verticalCenter="0" height="80" width="200" anchorOffsetX="0"/>
 	</e:Group>
 </e:Skin>

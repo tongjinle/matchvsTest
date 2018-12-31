@@ -37,7 +37,19 @@ module logic {
     userProfile?: string;
   }
 
-  export interface ILeaveRoomNotify {}
+  export interface ILeaveRoomNotify {
+    roomId: string;
+    owner: number;
+    userId: number;
+    cpProto: string;
+  }
+
+  export interface IKickPlayer {
+    owner: number;
+    userId: number;
+  }
+
+  export interface IKickPlayerNotify {}
 
   export interface IJoinOpen {}
 

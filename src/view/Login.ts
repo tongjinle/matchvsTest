@@ -27,7 +27,7 @@ class Login extends eui.Component implements eui.UIComponent {
 
     mgr.addEventListener(
       logic.EventNames.registerUser,
-      this.onRegisterUser,
+      this.onRegisterUserDone,
       this
     );
 
@@ -51,7 +51,7 @@ class Login extends eui.Component implements eui.UIComponent {
 
     mgr.removeEventListener(
       logic.EventNames.registerUser,
-      this.onRegisterUser,
+      this.onRegisterUserDone,
       this
     );
 
@@ -66,11 +66,30 @@ class Login extends eui.Component implements eui.UIComponent {
 
   private onInitResponse() {
     console.log("init success");
-    egret.localStorage.clear();
-    this.master.mgr.registerUser();
+    // egret.localStorage.clear();
+    // this.master.mgr.registerUser();
+
+    if (!egret.localStorage.getItem("openId")) {
+      egret.localStorage.setItem(
+        "openId",
+        "user" + Math.floor(1e8 * Math.random()).toString(16)
+      );
+    }
+    let openId: string = egret.localStorage.getItem("openId");
+    let session: string = "0";
+    this.master.mgr.registerWithThirdPart(openId, session).then(data => {
+      let user: logic.IUser = {
+        id: data.userId,
+        token: data.token,
+        logo: "http://pic.vszone.cn/upload/avatar/1464079978.png",
+        name: openId
+      };
+      this.master.userList.push(user);
+      this.master.userId = user.id;
+    });
   }
 
-  private onRegisterUser(e: egret.Event) {
+  private onRegisterUserDone(e: egret.Event) {
     console.log("register user success");
     let user: logic.IUser = e.data;
     this.master.userList.push(user);

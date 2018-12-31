@@ -3,6 +3,7 @@ class Lobby extends eui.Component implements eui.UIComponent {
   roomList: eui.List;
   createRoomBtn: eui.Button;
   enterRoomBtn: eui.Button;
+  refreshBtn: eui.Button;
 
   private roomDataList: logic.IRoom[] = [];
 
@@ -41,10 +42,24 @@ class Lobby extends eui.Component implements eui.UIComponent {
       this
     );
 
+    // 刷新房间
+    this.refreshBtn.addEventListener(
+      egret.TouchEvent.TOUCH_END,
+      this.getRoomList,
+      this
+    );
+
     // 创建房间
     this.createRoomBtn.addEventListener(
       egret.TouchEvent.TOUCH_END,
       this.onCreateRoom,
+      this
+    );
+
+    // 进入房间
+    this.enterRoomBtn.addEventListener(
+      egret.TouchEvent.TOUCH_END,
+      this.onReturnRoom,
       this
     );
 
@@ -120,6 +135,8 @@ class Lobby extends eui.Component implements eui.UIComponent {
     let data: logic.IRoom[] = e.data;
     this.roomDataList.push(...data);
     let me = this.master.me;
+
+    // 渲染房间列表
     let formatData = data.map(n => {
       return {
         isMe: n.owner === me.id,
@@ -129,12 +146,27 @@ class Lobby extends eui.Component implements eui.UIComponent {
     });
     console.log(formatData);
     this.roomList.dataProvider = new eui.ArrayCollection(formatData);
+
+    // 查看我是否已经在房间了
+    if (
+      this.master.lastRoomId &&
+      data.some(n => n.id === this.master.lastRoomId)
+    ) {
+      this.master.me.roomId = this.master.lastRoomId;
+    }
+    this.updateView();
   }
 
   private onJoinRoomDone(e): void {
     console.log("onJoinRoomDone");
     let data: logic.IJoinRoom = e.data;
     this.master.me.roomId = data.roomInfo.id;
+    this.master.changeView("waitRoom");
+  }
+
+  // 返回房间
+  // 因为其实已经在房间了,所以其实就是换个view
+  private onReturnRoom(): void {
     this.master.changeView("waitRoom");
   }
 

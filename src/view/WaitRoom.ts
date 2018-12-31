@@ -4,10 +4,47 @@ class WaitRoom extends eui.Component implements eui.UIComponent {
   otherLogo: eui.Image;
   playerName: eui.Label;
   otherPlayerName: eui.Label;
+  // 踢人按钮
   kickBtn: eui.Button;
+  // 离开房间按钮
+  leaveBtn: eui.Button;
+  // 开始游戏按钮
   startBtn: eui.Button;
 
+  private _currentPlayer: { userId: number; name: string; logo: string };
+  public get currentPlayer(): { userId: number; name: string; logo: string } {
+    return this._currentPlayer;
+  }
+  public set currentPlayer(v: { userId: number; name: string; logo: string }) {
+    this._currentPlayer = v;
+    //
+    if (v) {
+      this.logo.source = v.logo;
+      this.playerName.text = v.name;
+    }
+    this.updateView();
+  }
+
+  private _otherPlayer: { userId: number; name: string; logo: string };
+  public get otherPlayer(): { userId: number; name: string; logo: string } {
+    return this._otherPlayer;
+  }
+  public set otherPlayer(v: { userId: number; name: string; logo: string }) {
+    this._otherPlayer = v;
+    if (v) {
+      this.otherLogo.visible = true;
+      this.otherLogo.source = v.logo;
+      this.otherPlayerName.text = v.name;
+    } else {
+      this.otherLogo.visible = false;
+      this.otherPlayerName.text = "";
+    }
+    this.updateView();
+  }
+  // 房间id
   private roomId: string;
+  // 房间detail
+  private detail: logic.IRoomDetail;
   // 是否是房主
   private isOwner: boolean;
   // 是否可以开始游戏
@@ -27,21 +64,17 @@ class WaitRoom extends eui.Component implements eui.UIComponent {
 
   protected childrenCreated(): void {
     super.childrenCreated();
-
     console.warn("room childrenCreated");
+
+    this.clearStauts();
+    this.updateView();
 
     this.listen();
 
     let me = this.master.me;
     let roomId: string = me.roomId;
-    this.init(roomId);
-  }
-
-  init(roomId?: string): void {
-    if (roomId) {
-      this.roomId = roomId;
-    }
-    this.getRoomDetail();
+    this.roomId = me.roomId;
+    this.getRoomDetail(this.roomId);
   }
 
   private listen(): void {
@@ -61,9 +94,16 @@ class WaitRoom extends eui.Component implements eui.UIComponent {
       this
     );
 
-    // 监听玩家的退出房间
+    // 监听(其他)玩家的退出房间
     mgr.addEventListener(
-      logic.EventNames.joinOverNotify,
+      logic.EventNames.leaveRoomNotify,
+      this.onLeaveRoomNotifyDone,
+      this
+    );
+
+    // 监听(自己)退出房间
+    mgr.addEventListener(
+      logic.EventNames.leaveRoom,
       this.onLeaveRoomDone,
       this
     );
@@ -79,6 +119,13 @@ class WaitRoom extends eui.Component implements eui.UIComponent {
     this.startBtn.addEventListener(
       egret.TouchEvent.TOUCH_END,
       this.starGame,
+      this
+    );
+
+    // 离开房间
+    this.leaveBtn.addEventListener(
+      egret.TouchEvent.TOUCH_END,
+      this.leaveRoom,
       this
     );
   }
@@ -103,6 +150,8 @@ class WaitRoom extends eui.Component implements eui.UIComponent {
       this.starGame,
       this
     );
+
+    //
   }
   private release(): void {
     this.unListen();
@@ -110,31 +159,37 @@ class WaitRoom extends eui.Component implements eui.UIComponent {
 
   //
 
-  getRoomDetail(): void {
-    this.master.mgr.getRoomDetail(this.roomId);
+  getRoomDetail(roomId: string): void {
+    this.master.mgr.getRoomDetail(roomId);
   }
 
   onGetRoomDetailDone(e): void {
     let detail: logic.IRoomDetail = e.data;
     console.log("room detail:", detail);
-
+    this.detail = detail;
     let me = this.master.me;
-    let owner = detail.owner;
     let userList = detail.userList;
+    this.currentPlayer = undefined;
+    this.otherPlayer = undefined;
     userList.forEach(us => {
       let profile = JSON.parse(us.userProfile) as logic.IUser;
       if (us.userId === me.id) {
-        this.playerName.text = profile.name;
-        this.logo.source = profile.logo;
+        this.currentPlayer = {
+          userId: us.userId,
+          name: profile.name,
+          logo: profile.logo
+        };
       } else {
-        this.otherPlayerName.text = profile.name;
-        this.otherLogo.source = profile.logo;
+        this.otherPlayer = {
+          userId: us.userId,
+          name: profile.name,
+          logo: profile.logo
+        };
       }
     });
 
-    this.canStartGame = userList.length == 2;
-    this.isOwner = owner === me.id;
-    this.updateView();
+    // 记录最新的房间id
+    this.master.lastRoomId = this.roomId;
   }
 
   // 玩家进入房间
@@ -145,20 +200,55 @@ class WaitRoom extends eui.Component implements eui.UIComponent {
     this.otherPlayerName.text = profile.name;
     this.otherLogo.source = profile.logo;
   }
+  // 其他玩家退出房间
+  onLeaveRoomNotifyDone(e): void {
+    console.warn("someone leave room");
+    let data: logic.ILeaveRoomNotify = e.data;
+
+    // 清空对方选手的显示
+    this.otherPlayer = undefined;
+  }
 
   // 玩家退出房间
-  onLeaveRoomDone(e): void {}
+  onLeaveRoomDone(e): void {
+    let data: logic.ILeaveRoom = e.data;
+
+    // 状态清空(还原到还没有进来的时候)
+    this.clearStauts();
+    // 当前roomId置空
+    this.master.me.roomId = undefined;
+    this.master.lastRoomId = undefined;
+    // 切换到lobbyView
+    this.master.changeView("lobby");
+  }
 
   // 踢人
-  kickPlayer(id: number) {}
+  kickPlayer() {
+    let userId = this.otherPlayer.userId;
+    this.master.mgr.kickPlayer(userId);
+    console.log("kick player:", userId);
+  }
 
   // 开始游戏
   starGame(): void {}
 
-  private updateView() {
-    this.kickBtn.enabled = this.isOwner;
-    this.kickBtn.visible = this.isOwner;
+  // 离开房间
+  leaveRoom(): void {
+    this.master.mgr.leaveRoom();
+  }
 
-    this.startBtn.enabled = this.canStartGame;
+  private updateView() {
+    this.startBtn.enabled = this.detail && this.detail.userList.length == 2;
+    this.kickBtn.visible = this.kickBtn.enabled =
+      this.detail &&
+      this.currentPlayer &&
+      this.otherPlayer &&
+      this.detail.owner === this.master.me.id;
+  }
+
+  private clearStauts(): void {
+    this.roomId = undefined;
+    this.canStartGame = false;
+    this.isOwner = false;
   }
 }

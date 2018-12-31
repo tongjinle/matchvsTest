@@ -4,6 +4,17 @@ class GameView extends egret.DisplayObjectContainer {
   // 当前玩家的userId
   userId: number;
 
+  // 上一个room的id
+  private _lastRoomId: string;
+  public get lastRoomId(): string {
+    this._lastRoomId = egret.localStorage.getItem("lastRoomId") || undefined;
+    return this._lastRoomId;
+  }
+  public set lastRoomId(v: string) {
+    this._lastRoomId = v;
+    egret.localStorage.setItem("lastRoomId", v);
+  }
+
   public get me(): logic.IUser {
     return this.userList.find(n => n.id === this.userId);
   }

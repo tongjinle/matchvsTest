@@ -24,6 +24,10 @@
     {
       "name": "matchvs",
       "path": "./libs/matchvs"
+    },
+    {
+      "name": "md5",
+      "path": "./libs/md5"
     }
   ]
 }

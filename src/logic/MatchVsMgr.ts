@@ -32,6 +32,69 @@ module logic {
       console.log("init response CODE:", code);
     }
 
+    registerWithThirdPart(
+      openId: string,
+      session: string
+    ): Promise<{ userId: number; token: string }> {
+      let hash = new md5();
+      let reqUrl = Config.bindThirdUserIdUrl;
+      let appKey = Config.appKey;
+      let secretKey = Config.appSecret;
+      let gameId = Config.gameId;
+      //sign=md5(appKey&gameID=value1&openID=value2&session=value3&thirdFlag=value4&appSecret)
+      let params =
+        appKey +
+        "&gameID=" +
+        gameId +
+        "&openID=" +
+        openId +
+        "&session=" +
+        session +
+        "&thirdFlag=1&" +
+        secretKey;
+      //计算签名
+      let signstr = hash.hex_md5(params); //MD5 需要自己找方法
+      console.log({ signstr });
+      //重组参数 userID 传0
+      //用于post请求，不能使用get请求，如果使用get请求可能会出现签名失败，因为微信session_key有需要url编码的字符
+      let jsonParam = {
+        userID: 0,
+        gameID: gameId,
+        openID: openId,
+        session: session,
+        thirdFlag: 1,
+        sign: signstr
+      };
+      return new Promise((resolve, reject) => {
+        var request = new egret.HttpRequest();
+        request.responseType = egret.HttpResponseType.TEXT;
+        request.open(reqUrl, egret.HttpMethod.POST);
+        request.setRequestHeader("Content-Type", "application/json");
+        request.send(JSON.stringify(jsonParam));
+
+        request.addEventListener(
+          egret.Event.COMPLETE,
+          (event: egret.Event) => {
+            var request = <egret.HttpRequest>event.currentTarget;
+            console.log("bindOpenIDWithUserID get data : ", request.response);
+            let repData = JSON.parse(request.response);
+            console.log("bindOpenIDWithUserID repData : ", repData);
+            //绑定成功
+            if (repData.status == 0) {
+              //绑定成功就会返回 userID等信息
+              resolve({
+                userId: repData.data.userid,
+                token: repData.data.token
+              });
+            } else {
+              reject();
+            }
+          },
+          this
+        );
+      });
+    }
+
     // 注册账户
     registerUser(): void {
       this.engine.registerUser();
@@ -86,6 +149,11 @@ module logic {
     // 离开房间
     leaveRoom(cpProto: string = ""): void {
       this.engine.leaveRoom(cpProto);
+    }
+
+    // 踢人
+    kickPlayer(userId: number, cpProto: string = ""): void {
+      this.engine.kickPlayer(userId, cpProto);
     }
 
     // 打开房间
@@ -189,6 +257,8 @@ module logic {
       // 加入房间(主动)
       res.joinRoomResponse = (status, userInfoList, roomInfo) => {
         if (status === 200) {
+          console.warn("joinRoom in mgr:", userInfoList);
+
           let data: IJoinRoom = {
             userInfoList: userInfoList.map(n => {
               return {
@@ -203,11 +273,14 @@ module logic {
             }
           };
           this.fireEvent(EventNames.joinRoom, data);
+        } else {
+          console.error("join room error code:", status);
         }
       };
 
       // 加入房间(提醒)
       res.joinRoomNotify = userInfo => {
+        console.warn("joinRoomNotify in mgr:", userInfo);
         let data: IJoinRoomNotify = {
           userId: userInfo.userID,
           userProfile: userInfo.userProfile
@@ -224,18 +297,39 @@ module logic {
             userId: res.userID,
             cpProto: res.cpProto
           };
-          this.fireEvent(logic.EventNames.leaveRoom, data);
+          this.fireEvent(EventNames.leaveRoom, data);
         }
       };
 
       // 离开房间(提醒)
       res.leaveRoomNotify = res => {
-        let data: ILeaveRoom = {
+        let data: ILeaveRoomNotify = {
+          owner: res.owner,
           roomId: res.roomID,
           userId: res.userID,
           cpProto: res.cpProto
         };
-        this.fireEvent(logic.EventNames.leaveRoomNotify, data);
+        this.fireEvent(EventNames.leaveRoomNotify, data);
+      };
+
+      // 踢出房间(主动)
+      res.kickPlayerResponse = kick => {
+        if (kick.status === 200) {
+          let data: IKickPlayer = {
+            owner: kick.owner,
+            userId: kick.userID
+          };
+          this.fireEvent(EventNames.kickPlayer, data);
+        }
+      };
+
+      // 踢出房间(被动)
+      res.kickPlayerNotify = kick => {
+        let data: IKickPlayerNotify = {
+          owner: kick.owner,
+          userId: kick.userID
+        };
+        this.fireEvent(EventNames.kickPlayerNotify, data);
       };
 
       // 打开房间
@@ -286,6 +380,7 @@ module logic {
         }
       };
 
+      // 获取房间详情
       res.getRoomDetailResponse = res => {
         let status = res.status;
         if (status === 200) {
